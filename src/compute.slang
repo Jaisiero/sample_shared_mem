@@ -1,6 +1,7 @@
 #include "daxa/daxa.inl"
 #include "shared.inl"
 
+// Push constant struct
 [[vk::push_constant]] ComputePush p;
 
 // groupshared variables
@@ -24,5 +25,5 @@ groupshared Atomic<uint> m[4];
   uint count = m[i].load();
   global_histograms[i] += count;
   if(count > 0)
-    printf("Histogram global bin %d, count %d\n", i, count);
+    printf("Slang: Histogram global bin %d, count %d\n", i, count);
 }

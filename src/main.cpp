@@ -3,6 +3,8 @@
 #include <daxa/utils/pipeline_manager.hpp>
 #include <daxa/utils/task_graph.hpp>
 
+#define SHADER_LANG_SLANG 1
+
 int main(int argc, char const *argv[])
 {
     // Create a window
@@ -19,7 +21,11 @@ int main(int argc, char const *argv[])
                 DAXA_SHADER_INCLUDE_DIR,
                 "src/",
             },
+#if defined(SHADER_LANG_SLANG)
             .language = daxa::ShaderLanguage::SLANG,
+#else 
+            .language = daxa::ShaderLanguage::GLSL,
+#endif
             .enable_debug_info = true,
         },
         .name = "my pipeline manager",
@@ -30,10 +36,14 @@ int main(int argc, char const *argv[])
     {
         auto result = pipeline_manager.add_compute_pipeline({
             .shader_info = {
+#if defined(SHADER_LANG_SLANG)                
                 .source = daxa::ShaderFile{"compute.slang"}, 
                 .compile_options = {
                     .entry_point = "entry_compute_shader",
                 },
+#else
+                .source = daxa::ShaderFile{"compute.glsl"},
+#endif
             },
             .push_constant_size = sizeof(ComputePush),
             .name = "my pipeline",
@@ -88,6 +98,8 @@ int main(int argc, char const *argv[])
         device.wait_idle();
         device.collect_garbage();
     }
+
+    device.destroy_buffer(histogram_buffer);
 
     return 0;
 }
